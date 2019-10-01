@@ -1,0 +1,5 @@
+#! /bin/bash
+
+python more_video_control.py &
+
+mplayer -slave -input file=/tmp/mplayer-fifo bigbuckbunny320p.mp4
