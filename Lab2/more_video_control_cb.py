@@ -3,7 +3,7 @@
 import RPi.GPIO as GPIO
 import time
 import subprocess
-
+import sys
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(17, GPIO.IN, pull_up_down = GPIO.PUD_UP)
 GPIO.setup(22, GPIO.IN, pull_up_down = GPIO.PUD_UP)
@@ -36,6 +36,7 @@ def gpio26(channel):
 def gpio19(channel):
     cmd = "echo quit  > /tmp/mplayer-fifo"
     print subprocess.check_output(cmd, shell=True)
+    sys.exit()
     GPIO.cleanup()
 
 
@@ -48,8 +49,9 @@ if __name__ == "__main__":
     GPIO.add_event_detect(26, GPIO.RISING, callback = gpio26, bouncetime =300)
     GPIO.add_event_detect(19, GPIO.RISING, callback = gpio19, bouncetime =300)
 
-    while True:
-        a=1
+    while 1:
+        time.sleep(1)
+        
 
 
 	
