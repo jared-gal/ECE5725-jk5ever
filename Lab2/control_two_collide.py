@@ -34,8 +34,14 @@ screen = pygame.display.set_mode(size)
 WHITE = 255,255,255,255
 BLACK = 0,0,0
 
-my_font = pygame.font.Font(None, 50)
-my_buttons = {'start':(40,200) ,'quit':(280, 200)}
+
+my_font1 = pygame.font.Font(None, 50)
+my_font2 = pygame.font.Font(None, 25)
+
+my_buttons = {}
+my_buttons1 = {'start':(40,200) ,'quit':(280, 200)}
+my_buttons2 = {'pause':(40,200), 'fast':(100,200), 'slow':(160,200) ,'back':(280, 200)}
+
 screen.fill(BLACK)
 
 
@@ -60,12 +66,17 @@ if __name__ == "__main__":
     pos_String = "No Touch"
     quit = False
     ballGame = False
+    my_buttons = my_buttons1
+    started= False 
+    slp_tm = .01
+    my_font = my_font1
+    x,y = 0,0
     while(not quit):
-        time.sleep(.01)
+        time.sleep(slp_tm)
     	for event in pygame.event.get(): 
     		if(event.type is MOUSEBUTTONDOWN): 
     			pos = pygame.mouse.get_pos()
-    		elif(event.type is MOUSEBUTTONUP):
+    		elif(event.type is MOUSEBUTTONUP and started == False):
     			pos = pygame.mouse.get_pos()
     			x,y = pos
 
@@ -74,7 +85,34 @@ if __name__ == "__main__":
     					quit = True
 			if y>175:
 				if x<65:
+                                        started = True
+                                        my_font = my_font2
 					ballGame = True
+                                        my_buttons = my_buttons2
+
+                elif(event.type is MOUSEBUTTONUP and started == True):
+                        pos = pygame.mouse.get_pos()
+    			x,y = pos
+
+                        if y>175: 
+                                print(x)
+        			if x>255:
+
+                                        
+    					started = False
+                                        ballGame = False
+                                        my_buttons = my_buttons1
+                                        my_font = my_font1
+                                elif x<65:
+                                        ballGame = not ballGame
+                                        print ("pause")
+                                elif x>= 65 and x < 125:
+                                        print("fast")
+                                        slp_tm =  max( slp_tm /2.0, .001)        
+                                elif x>= 125 and x < 255:
+                                        print("slow")
+                                        slp_tm = min(slp_tm * 2, .1)
+                                        
 					
         if(ballGame):
 		ballrect = ballrect.move(speed)
@@ -127,5 +165,10 @@ if __name__ == "__main__":
     		screen.blit(text_surface, rect)
         screen.blit(ball, ballrect)
         screen.blit(ball2, ballrect2)
+	if(not started):
+		pos_String = "X: " + str(x) + " Y: " +str(y)
+                text_surface9=my_font.render(pos_String, True, WHITE)
+                rect9 = text_surface9.get_rect(center = (180,150))
+                screen.blit(text_surface9, rect9)
         pygame.display.flip()
                         
