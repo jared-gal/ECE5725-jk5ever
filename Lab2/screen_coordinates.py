@@ -20,7 +20,7 @@ WHITE = 255,255,255,255
 BLACK = 0,0,0
 
 my_font = pygame.font.Font(None, 50)
-my_buttons = {'quit':(40, 40)}
+my_buttons = {'quit':(280, 200)}
 screen.fill(BLACK)
 
 
@@ -43,6 +43,7 @@ if __name__ == "__main__":
     pygame.display.flip()
     pos_String = "No Touch"
     quit = False
+    coord_list = []
     while(not quit):
     	for event in pygame.event.get(): 
     		if(event.type is MOUSEBUTTONDOWN): 
@@ -51,7 +52,17 @@ if __name__ == "__main__":
     			pos = pygame.mouse.get_pos()
     			x,y = pos
 
-    			if y<65: 
-    				if x<65: 
+    			if y>175: 
+        			if x>255: 
     					quit = True
+                        coord_list.append([x,y])
+                        screen.fill(BLACK)
+                        pos_String = "X: " + str(x) + " Y: " +str(y)
+                        text_surface2=my_font.render(pos_String, True, WHITE)
+                        rect2 = text_surface2.get_rect(center = (180,150))
+                        screen.blit(text_surface2, rect2)
+                        screen.blit(text_surface, rect) 
+                        pygame.display.flip()
 
+    for item in coord_list:
+        print("X: " + str(item[0]) + " Y: " +str(item[1]))
