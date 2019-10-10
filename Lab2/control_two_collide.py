@@ -6,10 +6,10 @@ import RPi.GPIO as GPIO
 import os, sys
 
 # touchscreen stuff
-os.putenv('SDL_VIDEODRIVER', 'fbcon') # Display on piTFT
-os.putenv('SDL_FBDEV', '/dev/fb1') #
-os.putenv('SDL_MOUSEDRV', 'TSLIB') # Track mouse clicks on piTFT
-os.putenv('SDL_MOUSEDEV', '/dev/input/touchscreen')
+#os.putenv('SDL_VIDEODRIVER', 'fbcon') # Display on piTFT
+#os.putenv('SDL_FBDEV', '/dev/fb1') #
+#os.putenv('SDL_MOUSEDRV', 'TSLIB') # Track mouse clicks on piTFT
+#os.putenv('SDL_MOUSEDEV', '/dev/input/touchscreen')
 
 
 #ball game stuff

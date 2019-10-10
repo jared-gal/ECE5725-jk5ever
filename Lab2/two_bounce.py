@@ -2,8 +2,8 @@
 import RPi.GPIO as GPIO
 
 import os
-os.putenv('SDL_VIDEODRIVER','fbcon')
-os.putenv('SDL_FBDEV','/dev/fb0')
+#os.putenv('SDL_VIDEODRIVER','fbcon')
+#os.putenv('SDL_FBDEV','/dev/fb0')
 
 import sys, pygame
 pygame.init()
