@@ -12,7 +12,7 @@ os.putenv('SDL_MOUSEDRV', 'TSLIB') # Track mouse clicks on piTFT
 os.putenv('SDL_MOUSEDEV', '/dev/input/touchscreen')
 
 
-#ball game stuff
+#ball game stuff: speed, image loading, ball size
 speed = [1, 1]
 speed2 = [2, 2]
 black = 0, 0, 0
@@ -34,23 +34,26 @@ screen = pygame.display.set_mode(size)
 WHITE = 255,255,255,255
 BLACK = 0,0,0
 
+#menu buttons
 my_font = pygame.font.Font(None, 50)
 my_buttons = {'start':(40,200) ,'quit':(280, 200)}
 screen.fill(BLACK)
 
-
+#setting up the physical kill button
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(27, GPIO.IN, pull_up_down = GPIO.PUD_UP)
 
-
+#kill execution
 def quitCallback(channel):
     sys.exit()
 
 
 if __name__ == "__main__":
 
+	#setup of kill buton callback
     GPIO.add_event_detect(27, GPIO.FALLING, callback= quitCallback, bouncetime=300)
     
+	#setting up the menu buttons
     for my_text, text_pos in my_buttons.items():
     	text_surface = my_font.render(my_text, True, WHITE)
     	rect = text_surface.get_rect(center=text_pos)
@@ -59,24 +62,32 @@ if __name__ == "__main__":
 
     pos_String = "No Touch"
     quit = False
+	#variable to see if the ball game is started
     ballGame = False
+
     while(not quit):
+		#controlling frame rate
         time.sleep(.01)
     	for event in pygame.event.get(): 
     		if(event.type is MOUSEBUTTONDOWN): 
     			pos = pygame.mouse.get_pos()
+		#on mouse press
     		elif(event.type is MOUSEBUTTONUP):
     			pos = pygame.mouse.get_pos()
     			x,y = pos
-
+			
+			#reading if quit button pressed
     			if y>175: 
         			if x>255: 
     					quit = True
+			#if start button clicked
 			if y>175:
 				if x<65:
 					ballGame = True
 					
         if(ballGame):
+		
+		#ball collision logic drawn from ECE 4760 previous experience
 		ballrect = ballrect.move(speed)
     		ballrect2 = ballrect2.move(speed2)
     		if ballrect.left < 0 or ballrect.right > width:
@@ -120,6 +131,7 @@ if __name__ == "__main__":
 		        speed2[0] = speed2[0] - deltaV[0]
         		speed2[1] = speed2[1] - deltaV[1]
 
+	#redrawing the balls on the screen
 	screen.fill(BLACK)
 	for my_text, text_pos in my_buttons.items():
     		text_surface = my_font.render(my_text, True, WHITE)
