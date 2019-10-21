@@ -1,5 +1,6 @@
 #! /bin/bash
 
+#calling the control with callback implemented
 python more_video_control_cb.py &
 
 mplayer -slave -input file=/tmp/mplayer-fifo bigbuckbunny320p.mp4
