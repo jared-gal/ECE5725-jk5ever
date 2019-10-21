@@ -5,6 +5,7 @@ import os
 #os.putenv('SDL_VIDEODRIVER','fbcon')
 #os.putenv('SDL_FBDEV','/dev/fb0')
 
+#setting up the pygame variables
 import sys, pygame
 pygame.init()
 
@@ -12,14 +13,15 @@ size = width, height = 600, 800
 speed = [1, 1]
 speed2 = [2, 2]
 black = 0, 0, 0
-
 screen = pygame.display.set_mode(size)
 
+#loading in the two different balls
 ball  = pygame.image.load("magic_ball.png")
 ball2 = pygame.image.load("baseball_ball.png")
 ballrect  = ball.get_rect()
 ballrect2 = ball2.get_rect()
 
+#physical kill switch
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(27, GPIO.IN, pull_up_down = GPIO.PUD_UP)
 
@@ -28,6 +30,7 @@ while 1:
     for event in pygame.event.get():
         if event.type == pygame.QUIT: sys.exit()
 
+    #updating balls and relflecting them with wall collisions when necessary
     ballrect = ballrect.move(speed)
     ballrect2 = ballrect2.move(speed2)
     if ballrect.left < 0 or ballrect.right > width:
@@ -39,6 +42,7 @@ while 1:
     if ballrect2.top < 0 or ballrect2.bottom > height:
         speed2[1] = -speed2[1]
 
+    #erasing the screen and drawing the balls on it
     screen.fill(black)
     screen.blit(ball, ballrect)
     screen.blit(ball2, ballrect2)
