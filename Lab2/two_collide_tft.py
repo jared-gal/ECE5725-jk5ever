@@ -8,6 +8,7 @@ os.putenv('SDL_FBDEV','/dev/fb1')
 import sys, pygame
 pygame.init()
 
+#pygame params
 size = width, height = 320, 240
 speed = [1, 1]
 speed2 = [2, 2]
@@ -15,26 +16,28 @@ black = 0, 0, 0
 
 screen = pygame.display.set_mode(size)
 
+#loading in the ball images and resizing
 ball  = pygame.image.load("magic_ball.png")
 ball2 = pygame.image.load("baseball_ball.png")
-
 pygame.transform.scale(ball, (50, 50))
 pygame.transform.scale(ball2, (50, 50))
-
 ballrect  = ball.get_rect()
 ballrect2 = ball2.get_rect()
 ballR = 25
 ball2R = 20
 
+#physical kill button
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(27, GPIO.IN, pull_up_down = GPIO.PUD_UP)
 
 collision_count = 150
 
 while 1:
+    
     for event in pygame.event.get():
         if event.type == pygame.QUIT: sys.exit()
 
+    #reflecting the balls off of the wall
     ballrect = ballrect.move(speed)
     ballrect2 = ballrect2.move(speed2)
     if ballrect.left < 0 or ballrect.right > width:
@@ -47,6 +50,7 @@ while 1:
         speed2[1] = -speed2[1]
 
 
+    #collision logic from ECE 4760 previous work
     ballcenX = (ballrect.right - 25)
     ballcenY = (ballrect.top - 25)
 
@@ -84,16 +88,7 @@ while 1:
         speed2[1] = speed2[1] - deltaV[1]
 
 
-        
-        '''
-        tmpx = speed[0]
-        tmpy=speed[1]
-        speed[0] = speed2[0] #+ dv_x
-        speed[1] = speed2[1] #+ dv_y
-        speed2[0] = tmpx# - dv_x
-        speed2[1] = tmpy# - dv_y
-        '''
-
+    #Redrawing the screen with ball
     screen.fill(black)
     screen.blit(ball, ballrect)
     screen.blit(ball2, ballrect2)
