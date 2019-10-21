@@ -12,7 +12,7 @@ import os, sys
 #os.putenv('SDL_MOUSEDEV', '/dev/input/touchscreen')
 
 
-#ball game stuff
+#ball game stuff: speed, images, ball images, and a collision counter
 speed = [1, 1]
 speed2 = [2, 2]
 black = 0, 0, 0
@@ -34,27 +34,29 @@ screen = pygame.display.set_mode(size)
 WHITE = 255,255,255,255
 BLACK = 0,0,0
 
-
+#fonts for the menus
 my_font1 = pygame.font.Font(None, 50)
 my_font2 = pygame.font.Font(None, 25)
 
+#menu options
 my_buttons = {}
 my_buttons1 = {'start':(40,200) ,'quit':(280, 200)}
 my_buttons2 = {'pause':(40,200), 'fast':(100,200), 'slow':(160,200) ,'back':(280, 200)}
 
 screen.fill(BLACK)
 
-
+#setup physical kill switch
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(27, GPIO.IN, pull_up_down = GPIO.PUD_UP)
 
-
+#function to exit the program
 def quitCallback(channel):
     sys.exit()
 
 
 if __name__ == "__main__":
 
+    #a means to exit the program via button push
     GPIO.add_event_detect(27, GPIO.FALLING, callback= quitCallback, bouncetime=300)
     
     for my_text, text_pos in my_buttons.items():
@@ -63,6 +65,7 @@ if __name__ == "__main__":
     	screen.blit(text_surface, rect)
     pygame.display.flip()
 
+    #setting the inital buttons as well as the rate of reads
     pos_String = "No Touch"
     quit = False
     ballGame = False
@@ -71,31 +74,42 @@ if __name__ == "__main__":
     slp_tm = .01
     my_font = my_font1
     x,y = 0,0
+	
+    #continuously reading the screen until it's time to quit
     while(not quit):
         time.sleep(slp_tm)
     	for event in pygame.event.get(): 
     		if(event.type is MOUSEBUTTONDOWN): 
     			pos = pygame.mouse.get_pos()
+		#reading a press/mouse click release for the initial menu case
     		elif(event.type is MOUSEBUTTONUP and started == False):
     			pos = pygame.mouse.get_pos()
     			x,y = pos
-
+			
+			#testing what buttons have been pressed
+			#quit button
     			if y>175: 
         			if x>255: 
     					quit = True
+			#start game pressed
 			if y>175:
 				if x<65:
+					#setting the new menu buttons and starting ball game
                                         started = True
                                         my_font = my_font2
 					ballGame = True
                                         my_buttons = my_buttons2
-
+					
+		#reading a press/mouse click release for the initial menu case
                 elif(event.type is MOUSEBUTTONUP and started == True):
                         pos = pygame.mouse.get_pos()
     			x,y = pos
 
+			#reading the pressed button for ballgame menu
                         if y>175: 
                                 print(x)
+				
+				#end ballgame
         			if x>255:
 
                                         
@@ -103,17 +117,20 @@ if __name__ == "__main__":
                                         ballGame = False
                                         my_buttons = my_buttons1
                                         my_font = my_font1
+				#pause button
                                 elif x<65:
                                         ballGame = not ballGame
                                         print ("pause")
+				#speed up button
                                 elif x>= 65 and x < 125:
                                         print("fast")
-                                        slp_tm =  max( slp_tm /2.0, .001)        
+                                        slp_tm =  max( slp_tm /2.0, .001)  
+				#slow down button
                                 elif x>= 125 and x < 255:
                                         print("slow")
                                         slp_tm = min(slp_tm * 2, .1)
                                         
-					
+	#ballgame physics			
         if(ballGame):
 		ballrect = ballrect.move(speed)
     		ballrect2 = ballrect2.move(speed2)
@@ -158,6 +175,7 @@ if __name__ == "__main__":
 		        speed2[0] = speed2[0] - deltaV[0]
         		speed2[1] = speed2[1] - deltaV[1]
 
+	#updating the display screen based on what scenario the operation is in
 	screen.fill(BLACK)
 	for my_text, text_pos in my_buttons.items():
     		text_surface = my_font.render(my_text, True, WHITE)
