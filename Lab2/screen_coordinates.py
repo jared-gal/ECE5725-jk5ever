@@ -19,21 +19,23 @@ screen = pygame.display.set_mode(size)
 WHITE = 255,255,255,255
 BLACK = 0,0,0
 
+#setting up stuff for quit button
 my_font = pygame.font.Font(None, 50)
 my_buttons = {'quit':(280, 200)}
 screen.fill(BLACK)
 
-
+#physical quit button
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(27, GPIO.IN, pull_up_down = GPIO.PUD_UP)
 
-
+#quit callback
 def quitCallback(channel):
     sys.exit()
 
 
 if __name__ == "__main__":
 
+    #setup quit button
     GPIO.add_event_detect(27, GPIO.FALLING, callback= quitCallback, bouncetime=300)
     
     for my_text, text_pos in my_buttons.items():
@@ -43,26 +45,33 @@ if __name__ == "__main__":
     pygame.display.flip()
     pos_String = "No Touch"
     quit = False
+    
+    #setting up a list of presses to print later
     coord_list = []
     while(not quit):
     	for event in pygame.event.get(): 
     		if(event.type is MOUSEBUTTONDOWN): 
     			pos = pygame.mouse.get_pos()
+                
+            # on button press
     		elif(event.type is MOUSEBUTTONUP):
     			pos = pygame.mouse.get_pos()
     			x,y = pos
-
+                
+                #case of hitting the quit button
     			if y>175: 
         			if x>255: 
     					quit = True
-                        coord_list.append([x,y])
-                        screen.fill(BLACK)
-                        pos_String = "X: " + str(x) + " Y: " +str(y)
-                        text_surface2=my_font.render(pos_String, True, WHITE)
-                        rect2 = text_surface2.get_rect(center = (180,150))
-                        screen.blit(text_surface2, rect2)
-                        screen.blit(text_surface, rect) 
-                        pygame.display.flip()
+                #add the clicked coordinate to the list
+                coord_list.append([x,y])
+                screen.fill(BLACK)
+                #display the pressed location
+                pos_String = "X: " + str(x) + " Y: " +str(y)
+                text_surface2=my_font.render(pos_String, True, WHITE)
+                rect2 = text_surface2.get_rect(center = (180,150))
+                screen.blit(text_surface2, rect2)
+                screen.blit(text_surface, rect) 
+                pygame.display.flip()
 
     for item in coord_list:
         print("X: " + str(item[0]) + " Y: " +str(item[1]))
