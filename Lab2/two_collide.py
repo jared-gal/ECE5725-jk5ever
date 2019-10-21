@@ -8,6 +8,7 @@ os.putenv('SDL_FBDEV','/dev/fb0')
 import sys, pygame
 pygame.init()
 
+#setup of pygame params
 size = width, height = 600, 800
 speed = [1, 1]
 speed2 = [2, 2]
@@ -15,6 +16,7 @@ black = 0, 0, 0
 
 screen = pygame.display.set_mode(size)
 
+#loading relecant images
 ball  = pygame.image.load("magic_ball.png")
 ball2 = pygame.image.load("baseball_ball.png")
 ballrect  = ball.get_rect()
@@ -32,6 +34,7 @@ while 1:
     for event in pygame.event.get():
         if event.type == pygame.QUIT: sys.exit()
 
+    #ball reflections off of the wall
     ballrect = ballrect.move(speed)
     ballrect2 = ballrect2.move(speed2)
     if ballrect.left < 0 or ballrect.right > width:
@@ -43,7 +46,7 @@ while 1:
     if ballrect2.top < 0 or ballrect2.bottom > height:
         speed2[1] = -speed2[1]
 
-
+    #ball collision logic drawn from previous ECE 4760 project
     ballcenX = (ballrect.right - 64)
     ballcenY = (ballrect.top - 64)
 
@@ -82,15 +85,7 @@ while 1:
 
 
         
-        '''
-        tmpx = speed[0]
-        tmpy=speed[1]
-        speed[0] = speed2[0] #+ dv_x
-        speed[1] = speed2[1] #+ dv_y
-        speed2[0] = tmpx# - dv_x
-        speed2[1] = tmpy# - dv_y
-        '''
-
+    #redrawing the screen and balls
     screen.fill(black)
     screen.blit(ball, ballrect)
     screen.blit(ball2, ballrect2)
