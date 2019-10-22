@@ -8,11 +8,11 @@ os.putenv('SDL_FBDEV','/dev/fb0')
 
 GPIO.setmode(GPIO.BCM)
 
-#high_time = [1.48, 1.46, 1.44, 1.42,1.4,1.38, 1.36, 1.34, 1.32, 1.3]
-high_time=[1.4,1.3]
-high_time_ccw = [1.6,1.7]
+high_time = [1.48, 1.46, 1.44, 1.42,1.4,1.38, 1.36, 1.34, 1.32, 1.3]
+#high_time=[1.4,1.3]
+#high_time_ccw = [1.6,1.7]
 
-#high_time_ccw = [1.52,1.54,1.56,1.58,1.6,1.62,1.64,1.66,1.68,1.7]
+high_time_ccw = [1.52,1.54,1.56,1.58,1.6,1.62,1.64,1.66,1.68,1.7]
 
 #increment_f = (max_f-stop_f)/10
 

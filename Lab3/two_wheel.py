@@ -3,7 +3,12 @@
 import RPi.GPIO as GPIO
 import time
 import subprocess
-import sys
+import sys, os
+
+
+# touchscreen stuff
+os.putenv('SDL_VIDEODRIVER', 'fbcon') # Display on piTFT
+os.putenv('SDL_FBDEV', '/dev/fb1') #
 
 #SETUP FOR GPIO BUTTONS
 GPIO.setmode(GPIO.BCM)
@@ -49,7 +54,7 @@ def gpio19(channel):
 if __name__ == "__main__":
 
     #setting up callback events for each button
-    GPIO.add_event_detect(17, GPIO.FALLING, callback = gpio17, bouncetime =300)	
+    GPIO.add_event_detect(17, GPIO.FALLING, callback = gpio17, bouncetime =300) 
     GPIO.add_event_detect(22, GPIO.FALLING, callback = gpio22, bouncetime =300)
     GPIO.add_event_detect(23, GPIO.FALLING, callback = gpio23, bouncetime =300)
     GPIO.add_event_detect(27, GPIO.FALLING, callback = gpio27, bouncetime =300)
@@ -69,4 +74,4 @@ if __name__ == "__main__":
         
 
 
-	
+    
