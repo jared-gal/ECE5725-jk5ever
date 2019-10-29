@@ -23,6 +23,10 @@ left_dir  = "STOP"
 left_time = 0
 right_dir  = "STOP"
 right_time = 0
+begin_time = time.time()
+STRAIGHT_TIME=2
+TURN_TIME = 1.5
+
 
 #pygame setup basics
 pygame.init()
@@ -67,21 +71,26 @@ if __name__ == "__main__":
     screen.blit(right_1_R, right_1)
     screen.blit(right_1_R, right_2)
     screen.blit(right_1_R, right_3)
-        
+    #__________________________________________________________-
+    
+    #__________________________________________________________- 
     #initializing PWM on pin 4
-    servo_pinL = GPIO.PWM(4, 46.51)
+    servo_pinL = GPIO.PWM(5, 46.51)
     servo_pinL.start(0)
 
     #initializing PWM on pin5
-    servo_pinR = GPIO.PWM(5, 46.51)
+    servo_pinR = GPIO.PWM(4, 46.51)
     servo_pinR.start(0)
+    #__________________________________________________________-
     
     #state variable to define what is happening: 0 - just started, 1 - stopped, 2 - going straight, 3 - going back, 4 - turn left, 5 - turn right
     state = 0
-
+    #whether or not a new state was moved to
+    new_state = False
+    
     #to record what state we were in before emergency stopping and duration through it
     last_state = 0 
-    stopped_time = 0
+    start_time = 0
 
     #whether or not quit button was hit
     Quit = False
@@ -93,41 +102,28 @@ if __name__ == "__main__":
         time.sleep(.01)
         #update rectangles
         
-        if (update_hist_left):
-            left_time = round(time.time()-start_time)
-        
+        '''
+            left_time = round(time.time()-begin_time)
             left_3_R = left_2_R
             left_2_R = left_1_R
-            
-            
             left_2   = left_2_R.get_rect(center=(40,133))
             left_3   = left_3_R.get_rect(center=(40,166))
-            
-            
             left_1_R = my_fontS.render(left_dir+", "+str(left_time), True, WHITE)
             left_1 = left_1_R.get_rect(center=(40,100))
             
             
             
-           
-            
-            update_hist_left = False
-            
-            
-        if (update_hist_right):
-            right_time = round(time.time()-start_time)
+            right_time = round(time.time()-begin_time)
             right_3_R = right_2_R
             right_2_R = right_1_R
-            
             right_2   = right_2_R.get_rect(center=(280,133))
             right_3   = right_3_R.get_rect(center=(280,166))
-            
             right_1_R = my_fontS.render(right_dir+", "+str(right_time), True, WHITE)
             right_1 = right_1_R.get_rect(center=(280,100))
             
-            
-            update_hist_right = False
-            
+        
+        '''
+        
         screen.fill(BLACK)
         screen.blit(left_1_R, left_1)
         screen.blit(left_2_R, left_2)
@@ -149,40 +145,201 @@ if __name__ == "__main__":
                     if x>255: 
                         Quit = True
                 elif y<145 and y>95 and x>135 and x<185:
-                    if not(state == 1):
-                        my_buttons = my_buttons_cont
-                       
-			last_state = state
-			stop_time = dur
-			state == 1
-                    else:
+                    #start state
+                    if state ==0:
                         my_buttons = my_buttons_stop
-                    	state = last_state
-			dur = stop_time
+                        state = 2
+                        new_state = True
+                        print("STarting")
+                    #hit it while stopped -> resume op and now display stop button
+                    elif state ==1:
+                        my_buttons = my_buttons_stop
+                        state = last_state
+                        start_time = time.time()
+                        new_state = True
+                    #hit while going -> go to stop state and show continue button
+                    else:
+                        my_buttons = my_buttons_cont
+                        last_state = state
+                        state = 1
+                        new_state = True
 
         if state == 0:
-	    my_buttons = my_buttons_start
-	    #update freq and duty to be 0 for both  
-            pygame.draw.circle(screen, RED, [160,120], 60)
-        elif state ==1:
-	    #update history to have new stop term
-	    #set duty cycle to be 0
-	elif state ==2:
-	    #update history with forward entries for L and R (ccw and CW)
-	    #set appropriate speeds to be half max
-	elif state ==3:
-	   #
-	elif state ==4:
-
-	elif state ==5:
-
-        else:
-
-
-
-
-
+            print("STart")
+            my_buttons = my_buttons_start
+            #update freq and duty to be 0 for both
+            servo_pinL.start(0)
+            servo_pinR.start(0)
             pygame.draw.circle(screen, GREEN, [160,120], 60)
+        elif state ==1:
+            print("Stop")
+        #update history to have new stop term
+            if new_state:
+                new_state = False
+                left_time = round(time.time()-begin_time)
+                left_3_R = left_2_R
+                left_2_R = left_1_R
+                left_2   = left_2_R.get_rect(center=(40,133))
+                left_3   = left_3_R.get_rect(center=(40,166))
+                left_1_R = my_fontS.render("STOP"+", "+str(left_time), True, WHITE)
+                left_1 = left_1_R.get_rect(center=(40,100))
+                
+                
+                
+                right_time = round(time.time()-begin_time)
+                right_3_R = right_2_R
+                right_2_R = right_1_R
+                right_2   = right_2_R.get_rect(center=(280,133))
+                right_3   = right_3_R.get_rect(center=(280,166))
+                right_1_R = my_fontS.render("STOP"+", "+str(right_time), True, WHITE)
+                right_1 = right_1_R.get_rect(center=(280,100))
+                
+            #set duty cycle to be 0
+            servo_pinL.start(0)
+            servo_pinR.start(0)
+            pygame.draw.circle(screen, GREEN, [160,120], 60)
+            
+        #GO STRAIGHT
+        elif state ==2:
+            print("STraight")
+            if new_state:
+                new_state = False
+                start_time = time.time()
+                
+                left_time = round(time.time()-begin_time)
+                left_3_R = left_2_R
+                left_2_R = left_1_R
+                left_2   = left_2_R.get_rect(center=(40,133))
+                left_3   = left_3_R.get_rect(center=(40,166))
+                left_1_R = my_fontS.render("CCW"+", "+str(left_time), True, WHITE)
+                left_1 = left_1_R.get_rect(center=(40,100))
+                
+                
+                
+                right_time = round(time.time()-begin_time)
+                right_3_R = right_2_R
+                right_2_R = right_1_R
+                right_2   = right_2_R.get_rect(center=(280,133))
+                right_3   = right_3_R.get_rect(center=(280,166))
+                right_1_R = my_fontS.render("CW"+", "+str(right_time), True, WHITE)
+                right_1 = right_1_R.get_rect(center=(280,100))
+                
+            if (time.time() - start_time > STRAIGHT_TIME):
+                state = 3
+                new_state = True
+            #update history with forward entries for L and R (ccw and CW)
+            #set appropriate speeds to be half max
+            servo_pinR.ChangeFrequency(46.723)
+            servo_pinR.ChangeDutyCycle(6.54)
+            servo_pinL.ChangeFrequency(46.296)
+            servo_pinL.ChangeDutyCycle(7.407)
+            pygame.draw.circle(screen, RED, [160,120], 60)
+            
+        #GO BACK
+        elif state ==3:
+            if new_state:
+                new_state = False
+                start_time = time.time()
+                
+                left_time = round(time.time()-begin_time)
+                left_3_R = left_2_R
+                left_2_R = left_1_R
+                left_2   = left_2_R.get_rect(center=(40,133))
+                left_3   = left_3_R.get_rect(center=(40,166))
+                left_1_R = my_fontS.render("CW"+", "+str(left_time), True, WHITE)
+                left_1 = left_1_R.get_rect(center=(40,100))
+                
+                
+                
+                right_time = round(time.time()-begin_time)
+                right_3_R = right_2_R
+                right_2_R = right_1_R
+                right_2   = right_2_R.get_rect(center=(280,133))
+                right_3   = right_3_R.get_rect(center=(280,166))
+                right_1_R = my_fontS.render("CCW"+", "+str(right_time), True, WHITE)
+                right_1 = right_1_R.get_rect(center=(280,100))
+                
+            if (time.time() - start_time > STRAIGHT_TIME):
+                state = 4
+                new_state = True
+           #update history with forward entries for L and R (ccw and CW)
+            #set appropriate speeds to be half max
+            servo_pinL.ChangeFrequency(46.723)
+            servo_pinL.ChangeDutyCycle(6.54)
+            servo_pinR.ChangeFrequency(46.296)
+            servo_pinR.ChangeDutyCycle(7.407)
+            pygame.draw.circle(screen, RED, [160,120], 60)
+            
+        #TURN LEFT
+        elif state ==4:
+            if new_state:
+                new_state = False
+                start_time = time.time()
+                
+                left_time = round(time.time()-begin_time)
+                left_3_R = left_2_R
+                left_2_R = left_1_R
+                left_2   = left_2_R.get_rect(center=(40,133))
+                left_3   = left_3_R.get_rect(center=(40,166))
+                left_1_R = my_fontS.render("STOP"+", "+str(left_time), True, WHITE)
+                left_1 = left_1_R.get_rect(center=(40,100))
+                
+                
+                
+                right_time = round(time.time()-begin_time)
+                right_3_R = right_2_R
+                right_2_R = right_1_R
+                right_2   = right_2_R.get_rect(center=(280,133))
+                right_3   = right_3_R.get_rect(center=(280,166))
+                right_1_R = my_fontS.render("CW"+", "+str(right_time), True, WHITE)
+                right_1 = right_1_R.get_rect(center=(280,100))
+                
+            if (time.time() - start_time > TURN_TIME):
+                state = 5
+                new_state = True
+           #update history with forward entries for L and R (ccw and CW)
+            #set appropriate speeds to be half max
+            servo_pinL.ChangeFrequency(46.51)
+            servo_pinL.ChangeDutyCycle(6.977)
+            servo_pinR.ChangeFrequency(46.723)
+            servo_pinR.ChangeDutyCycle(6.54)
+            pygame.draw.circle(screen, RED, [160,120], 60)
+            
+        #TURN RIGHT
+        elif state ==5:
+            if new_state:
+                new_state = False
+                start_time = time.time()
+                
+                left_time = round(time.time()-begin_time)
+                left_3_R = left_2_R
+                left_2_R = left_1_R
+                left_2   = left_2_R.get_rect(center=(40,133))
+                left_3   = left_3_R.get_rect(center=(40,166))
+                left_1_R = my_fontS.render("CCW"+", "+str(left_time), True, WHITE)
+                left_1 = left_1_R.get_rect(center=(40,100))
+                
+                
+                
+                right_time = round(time.time()-begin_time)
+                right_3_R = right_2_R
+                right_2_R = right_1_R
+                right_2   = right_2_R.get_rect(center=(280,133))
+                right_3   = right_3_R.get_rect(center=(280,166))
+                right_1_R = my_fontS.render("STOP"+", "+str(right_time), True, WHITE)
+                right_1 = right_1_R.get_rect(center=(280,100))
+                
+            if (time.time() - start_time > TURN_TIME):
+                state = 2
+                new_state = True
+           #update history with forward entries for L and R (ccw and CW)
+            #set appropriate speeds to be half max
+            servo_pinR.ChangeFrequency(46.51)
+            servo_pinR.ChangeDutyCycle(6.977)
+            servo_pinL.ChangeFrequency(46.296)
+            servo_pinL.ChangeDutyCycle(7.407)
+            pygame.draw.circle(screen, RED, [160,120], 60)
+        else:
             servo_pinL.ChangeFrequency(46.51)
             servo_pinL.ChangeDutyCycle(6.977)
             servo_pinR.ChangeFrequency(46.51)
@@ -194,9 +351,7 @@ if __name__ == "__main__":
             screen.blit(text_surface, rect)
 
         pygame.display.flip()
-
-	#start of FSM
-	
+    
 
 
     GPIO.cleanup()
