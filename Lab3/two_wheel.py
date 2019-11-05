@@ -35,8 +35,7 @@ def gpio23(channel):
 
 #BUTTONS FOR THE RIGHT SERVO
 def gpio27(channel):
-    servo_pinR.ChangeFrequency(46.51)
-    servo_pinR.ChangeDutyCycle(6.977)
+    servo_pinR.ChangeDutyCycle(0)
     print("27")
 
 def gpio26(channel):
