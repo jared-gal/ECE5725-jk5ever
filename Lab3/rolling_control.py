@@ -30,20 +30,23 @@ left_time = 0
 right_dir  = "STOP"
 right_time = 0
 start_time = time.time()
+
 #left servo stop
 def gpio17(channel):
     global update_hist_left
     global left_dir
-    servo_pinL.ChangeFrequency(46.51)
-    servo_pinL.ChangeDutyCycle(6.977)
+    #handling the change of duty cycle as well as flagging to update
+    #the scrolling history with the new command
+    servo_pinL.ChangeDutyCycle(0)
     update_hist_left = True
     left_dir  = "STOP"
     
-    print("cb")
-    #left servo CW
+#left servo CW
 def gpio22(channel):
     global update_hist_left
     global left_dir
+    #handling the change of duty cycle/freqeuncy as well as flagging to update
+    #the scrolling history with the new command
     servo_pinL.ChangeFrequency(46.95)
     servo_pinL.ChangeDutyCycle(6.1)
     update_hist_left = True
@@ -53,6 +56,8 @@ def gpio22(channel):
 def gpio23(channel):
     global update_hist_left
     global left_dir
+    #handling the change of duty cycle/freqeuncy as well as flagging to update
+    #the scrolling history with the new command
     servo_pinL.ChangeFrequency(46.08)
     servo_pinL.ChangeDutyCycle(7.83)
     update_hist_left = True
@@ -62,14 +67,17 @@ def gpio23(channel):
 def gpio27(channel):
     global update_hist_right
     global right_dir
-    servo_pinR.ChangeFrequency(46.51)
-    servo_pinR.ChangeDutyCycle(6.977)
+    #handling the change of duty cycle as well as flagging to update
+    #the scrolling history with the new command
+    servo_pinR.ChangeDutyCycle(0)
     update_hist_right = True
     right_dir  = "STOP"
 
 def gpio26(channel):
     global update_hist_right
     global right_dir
+    #handling the change of duty cycle/freqeuncy as well as flagging to update
+    #the scrolling history with the new command
     servo_pinR.ChangeFrequency(46.95)
     servo_pinR.ChangeDutyCycle(6.1)
     update_hist_right = True
@@ -78,6 +86,8 @@ def gpio26(channel):
 def gpio19(channel):
     global update_hist_right
     global right_dir
+    #handling the change of duty cycle/freqeuncy as well as flagging to update
+    #the scrolling history with the new command
     servo_pinR.ChangeFrequency(46.08)
     servo_pinR.ChangeDutyCycle(7.83)
     update_hist_right = True
@@ -113,7 +123,7 @@ if __name__ == "__main__":
     GPIO.add_event_detect(26, GPIO.RISING, callback = gpio26, bouncetime =300)
     GPIO.add_event_detect(19, GPIO.RISING, callback = gpio19, bouncetime =300)
     
-    
+    #initializing the rolling history for left wheel
     left_1_R = my_fontS.render('STOP, 0', True, WHITE)
     left_1   = left_1_R.get_rect(center=(40,100))
     left_2_R = my_fontS.render('STOP, 0', True, WHITE)
@@ -121,6 +131,7 @@ if __name__ == "__main__":
     left_3_R = my_fontS.render('STOP, 0', True, WHITE)
     left_3   = left_1_R.get_rect(center=(40,166))
     
+    #initializing the rolling history for right wheel
     right_1_R = my_fontS.render('STOP, 0', True, WHITE)
     right_1   = right_1_R.get_rect(center=(280,100))
     right_2_R = my_fontS.render('STOP, 0', True, WHITE)
@@ -128,6 +139,7 @@ if __name__ == "__main__":
     right_3_R = my_fontS.render('STOP, 0', True, WHITE)
     right_3   = right_1_R.get_rect(center=(280,166))
     
+    #bliting the initila histories
     screen.blit(left_1_R, left_1)
     screen.blit(left_1_R, left_2)
     screen.blit(left_1_R, left_3)
@@ -148,45 +160,33 @@ if __name__ == "__main__":
     Quit = False
     my_buttons = my_buttons_go
     
+    #loop to handle continuously updating screen and reading button presses on TFT
     while(not Quit):
         time.sleep(.01)
         #update rectangles
-        
+        #update left scrolling history if the flag is changed
         if (update_hist_left):
             left_time = round(time.time()-start_time)
-        
             left_3_R = left_2_R
             left_2_R = left_1_R
-            
-            
             left_2   = left_2_R.get_rect(center=(40,133))
             left_3   = left_3_R.get_rect(center=(40,166))
-            
-            
             left_1_R = my_fontS.render(left_dir+", "+str(left_time), True, WHITE)
             left_1 = left_1_R.get_rect(center=(40,100))
-            
-            
-            
-           
-            
             update_hist_left = False
             
-            
+        #update right scrolling history if the flag is changed    
         if (update_hist_right):
             right_time = round(time.time()-start_time)
             right_3_R = right_2_R
             right_2_R = right_1_R
-            
             right_2   = right_2_R.get_rect(center=(280,133))
             right_3   = right_3_R.get_rect(center=(280,166))
-            
             right_1_R = my_fontS.render(right_dir+", "+str(right_time), True, WHITE)
             right_1 = right_1_R.get_rect(center=(280,100))
-            
-            
             update_hist_right = False
-            
+        
+        #blitting the new histories to the screen
         screen.fill(BLACK)
         screen.blit(left_1_R, left_1)
         screen.blit(left_2_R, left_2)
@@ -196,17 +196,18 @@ if __name__ == "__main__":
         screen.blit(right_3_R, right_3)
         
     
-        
+        #reading screen button presses
         for event in pygame.event.get(): 
             if(event.type is MOUSEBUTTONDOWN): 
                 pos = pygame.mouse.get_pos()
             elif(event.type is MOUSEBUTTONUP):
                 pos = pygame.mouse.get_pos()
                 x,y = pos
-
+                #quit button hit
                 if y>175: 
                     if x>255: 
                         Quit = True
+                #stop/resume button hit
                 elif y<145 and y>95 and x>135 and x<185:
                     if stopped:
                         my_buttons = my_buttons_stop
@@ -214,17 +215,15 @@ if __name__ == "__main__":
                     else:
                         my_buttons = my_buttons_go
                     stopped = not stopped
-
+        #drawing the correct color circle and then stopping the rolling if the stop button is hit
         if stopped:
             pygame.draw.circle(screen, RED, [160,120], 60)
             
         else:
             pygame.draw.circle(screen, GREEN, [160,120], 60)
-            servo_pinL.ChangeFrequency(46.51)
-            servo_pinL.ChangeDutyCycle(6.977)
-            servo_pinR.ChangeFrequency(46.51)
-            servo_pinR.ChangeDutyCycle(6.977)
-            
+            servo_pinL.ChangeDutyCycle(0)
+            servo_pinR.ChangeDutyCycle(0)
+        #displaying appropriate button set based on state (stopped or not)   
         for my_text, text_pos in my_buttons.items():
             text_surface = my_fontB.render(my_text, True, WHITE)
             rect = text_surface.get_rect(center=text_pos)
