@@ -23,8 +23,7 @@ GPIO.setup(5, GPIO.OUT)
 
 #BUTTONS FOR THE LEFT SERVO
 def gpio17(channel):
-    servo_pinL.ChangeFrequency(46.51)
-    servo_pinL.ChangeDutyCycle(6.977)
+    servo_pinL.ChangeDutyCycle(0)
 
 def gpio22(channel):
     servo_pinL.ChangeFrequency(46.95)
